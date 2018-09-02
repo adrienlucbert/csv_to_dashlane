@@ -15,3 +15,30 @@ How to :
 - Rename this .txt file with the .csv extension.
 - Import the new .csv file in Dashlane.
 - It should success import all your passwords ;)
+
+Example :
+
+Input (keypass export) :
+```
+"Account","Login Name","Password","Web Site","Comments"
+"NOM1","moi@gmail.com","AbdDef","www.twitter.com","Ma 
+note 
+pour \" hello there! \"
+Twitter 
+ici"
+"NOM3","lui@gmail.com","Ghijkl","www.google.com","prise de notes"
+"NOM2","","","","prise de notes"
+"NOM4","","","","prise de notes"
+```
+Output :
+```
+"nom","identifiant","mots de passe","site web","note","identifiant2","categorie"
+"NOM1","moi@gmail.com","AbdDef","www.twitter.com","Ma 
+note 
+pour \" hello there! \" 
+Twitter 
+ici","",""
+"NOM3","lui@gmail.com","Ghijkl","www.google.com","prise de notes","",""
+"NOM2","Identif","MotDePasse","www.site.com","prise de notes","",""
+"NOM4","Identif","MotDePasse","www.site.com","prise de notes","",""
+```
