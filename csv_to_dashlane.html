@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<head>
+    <title>CSV 2 DASHLANE</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <script>
+        function getFile(filename = prompt('file url / absolute or relative path : ')) {
+            // get the given file from url (or absolute / relative path)
+            var xhr_get_file = new XMLHttpRequest();
+            xhr_get_file.open('POST', filename, false);
+            xhr_get_file.onreadystatechange = function() {
+                console.log(xhr_get_file);
+                if(xhr_get_file.readyState == 4) {
+                    if(xhr_get_file.status == 404) {
+                        // if file not found, ask a new path
+                        getFile();
+                    } else {
+                        // 
+                        explode_file(xhr_get_file.response);
+                    }
+                }
+            }
+            xhr_get_file.send();
+        }
+        
+        function arrayDiff(arrayA, arrayB){
+            // function to get difference between 2 arrays
+            // for every element of arrayA check if present in arrayB, if not, push in result array 
+            var result=[];
+
+            for (var i=0; i < arrayA.length; i++){
+                if ( arrayB.indexOf(arrayA[i]) <= -1 ){ 
+                    result.push(arrayA[i]);
+                }
+            }
+            return result;
+        }
+
+        getFile();
+
+        function explode_file(file_content) {
+            // function to explode file content into entries, containing fields
+            // change the two following arrays to customize your columns names and placeholders
+
+            // column names to display
+            col_names = ["nom","identifiant","mots de passe","site web","note","identifiant2","categorie"];
+            // placeholders in case field is empty
+            placeholders = ["Nom","Identif","MotDePasse","www.site.com","Note","",""];
+
+            // replace line breaks with printable \n
+            file_content = file_content.split("\n").join("\\n");
+            // replace \" to avoid errors (to be undone later)
+            file_content = file_content.replace(/\\"/g, '|\\"|');
+            // delete first "
+            file_content = file_content.replace(/^"/, '');
+            // create a custom separator |&|
+            file_content = file_content.replace(/","/gm, '|&|');
+            // create custom entry separator |@|
+            file_content = file_content.replace(/\\n"/gm, '|@|');
+            // remove " before entry separator |@|
+            file_content = file_content.replace(/"\|@\|/gm, '|@|');
+            // remove "\n at the end of the file
+            file_content = file_content.replace(/[\"\\n\s]+$/gm, '');
+
+            lines = file_content.split('|@|');
+
+            // array of entries into which fields have names
+            var entries_associative = [];
+            // array of entries into which fields have indices
+            var entries = [];
+
+            // skip first line : col names
+            for(let l = 1; l < lines.length; l++) {
+                var fields = lines[l].split('|&|')
+
+                var new_entry_associative = {};
+                var new_entry = [];
+
+                for(let x = 0; x < col_names.length; x++) {
+                    if(fields[x] == "" || fields[x] == undefined) {
+                        fields[x] = placeholders[x];
+                    }
+                    // undo line 53 : replace |\"| with \"
+                    fields[x] = fields[x].replace(/\|\\"\|/g, '\\"');
+
+                    // push field in new_entry array
+                    new_entry_associative[col_names[x]] = fields[x];
+                    new_entry.push(fields[x]);
+                }
+
+                // push new_entry in entries arrays
+                entries.push(new_entry);
+                entries_associative.push(new_entry_associative);
+            }
+
+            // finally write entries on the document
+            write_entries(entries);
+        }
+
+        function write_entries(entries) {
+            // write the column names
+            document.body.innerHTML = '"'+col_names.join('","')+'"<br>';
+
+            for(let e in entries) {
+                for(let f in entries[e]) {
+                    // replace \n with html line breaks <br>
+                    entries[e][f] = entries[e][f].replace(/\\n/g, '<br>');
+                    // remove last white space
+                    entries[e][f] = entries[e][f].replace(/\s$/g, '');
+                    if(f == entries[e].length-1) {
+                        // don't display ending ,
+                        document.body.innerHTML += '"' + entries[e][f] + '"';
+                    } else {
+                        document.body.innerHTML += '"' + entries[e][f] + '",';
+                    }
+                }
+                // line break at the end of each entry
+                document.body.innerHTML += "<br>";
+            }
+
+            // display instructions after entries displayed
+            setTimeout(function() {
+                alert('Copy the page content in a .csv file, then import it in dashlane');
+            },0);
+        }
+    </script>
+</body>
