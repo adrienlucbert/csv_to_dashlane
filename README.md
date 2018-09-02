@@ -1,4 +1,4 @@
-# csv_to_dashlane
+# CSV to Dashlane
 Convert a .csv file (exported from another password manager) to make it compatible with Dashlane
 
 Because this script is using XMLHttpRequest to get the csv file content, it needs to be executed on a webserver (prefer local webserver for more safety).
