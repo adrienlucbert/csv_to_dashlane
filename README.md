@@ -18,7 +18,7 @@ How to :
 
 Example :
 
-Input (keypass export) :
+Input (keepass export) :
 ```
 "Account","Login Name","Password","Web Site","Comments"
 "NOM1","moi@gmail.com","AbdDef","www.twitter.com","Ma 
